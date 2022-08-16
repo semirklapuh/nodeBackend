@@ -10,11 +10,15 @@ const LoginDataSchema = new Schema(
     password: {
       type: String,
       required: true,
-    }
+    },
+    iv: {
+      type: String,
+      require: true,
+    },
   },
   { timestamps: true }
 );
 
 const LoginData = mongoose.model("LoginData", LoginDataSchema);
 
-module.exports = LoginData
+module.exports = LoginData;

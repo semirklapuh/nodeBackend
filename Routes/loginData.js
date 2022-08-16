@@ -2,8 +2,10 @@ const express = require("express");
 const router = express.Router();
 const LoginData = require("../Models/loginData");
 
+const { encrypt, decrypt } = require("../EncryptionHandler");
+
 router.get("/", (req, res) => {
-    LoginData.find()
+  LoginData.find()
     .then((result) => {
       res.send(result);
     })
@@ -11,7 +13,7 @@ router.get("/", (req, res) => {
 });
 
 router.get("/:id", (req, res) => {
-    LoginData.findById(req.params.id)
+  LoginData.findById(req.params.id)
     .then((result) => {
       res.send(result);
     })
@@ -19,13 +21,13 @@ router.get("/:id", (req, res) => {
 });
 
 router.get("/getByUsername/:username", (req, res) => {
-    LoginData.findOne({ username: req.params.username })
+  LoginData.findOne({ username: req.params.username })
     .then((result) => {
       if (result === null) {
-        console.log("data is empty")
+        console.log("data is empty");
         res.sendStatus(404);
       } else {
-       res.setHeader("Access-Control-Allow-Origin", "*");
+        res.setHeader("Access-Control-Allow-Origin", "*");
         res.send(result);
       }
     })
@@ -35,9 +37,11 @@ router.get("/getByUsername/:username", (req, res) => {
 });
 
 router.post("/", (req, res) => {
+  const hashedPassword = encrypt(req.body.password);
   const loginData = new LoginData({
     username: req.body.username,
-    password: req.body.password
+    password: hashedPassword,
+    // iv: hashedPassword.iv,
   });
 
   loginData
@@ -50,6 +54,10 @@ router.post("/", (req, res) => {
     .catch((err) => console.log(err));
 });
 
+router.post("/decrypt-password", (req, res) => {
+  res.send(decrypt(req.body.password));
+});
+//
 // router.put("/:id", (req, res) => {
 //   var query = { _id: req.params.id };
 //   var newValues = {
